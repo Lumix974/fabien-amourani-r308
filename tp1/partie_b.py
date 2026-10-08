@@ -12,8 +12,7 @@ def deviner_nombre(borne_min=1, borne_max=100):
     Retour :
         str : Message de victoire, de défaite ou d'erreur.
     """
-    if borne_min >= borne_max:  # Vérification des bornes
-        return "Erreur : les bornes sont invalides."
+    if borne_min >= borne_max: return "Erreur : bornes invalides."  # Vérification des bornes
 
     nb_random = random.randint(borne_min, borne_max)  # Nombre aléatoire
     essai = 1  # Initialisation du compteur
@@ -32,14 +31,9 @@ def deviner_nombre(borne_min=1, borne_max=100):
             print(f"Erreur : entrez un nombre entre {borne_min} et {borne_max}.")
             continue
 
-        if nb_joueur < nb_random:
-            print("Trop petit")
+        if nb_joueur == nb_random: return f"Gagné en {essai} essai(s) !"
 
-        elif nb_joueur > nb_random:
-            print("Trop grand")
-
-        else:
-            return f"Gagné en {essai} essai(s) !"
+        print("Trop petit" if nb_joueur < nb_random else "Trop grand")
 
         essai += 1  # Incrémentation du compteur
 
@@ -62,9 +56,7 @@ def jouer(borne_min=1, borne_max=100):
         while True:
             reponse = input("\nRejouer ? (o/n) : ").strip().lower()
 
-            if reponse in ("o", "n"):  # Vérification de la réponse
-                break
-
+            if reponse in ("o", "n"): break # Vérification de la réponse
             print("Erreur : entrez o ou n.")
 
         if reponse == "n":  # Arrêt du jeu
