@@ -113,14 +113,18 @@ def jouer(scores):
             print("Erreur : nom invalide.")
             continue
 
+        scores.setdefault(nom, 0.0)  # Ajoute le joueur avec 0 victoire s'il n'existe pas
+
         mot = choisir_mode()  # Choix du mode
         resultat = jouer_pendu(mot) if mot else "Erreur : aucun mot disponible."
 
         print(resultat)
 
         if resultat.startswith("Gagné"):  # Vérification de la victoire
-            scores[nom] = scores.get(nom, 0.0) + 1  # Ajout d'une victoire
-            print(f"{nom} : {scores[nom]} victoire(s)")
+            scores[nom] += 1  # Ajout d'une victoire
+
+        print(f"{nom} : {scores[nom]} victoire(s)")
+        sauvegarder_scores(scores, "scores.txt")  # Sauvegarde après chaque partie
 
         while True:
             reponse = input("\nRejouer ? (o/n) : ").strip().lower()
