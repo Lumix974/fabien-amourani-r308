@@ -38,11 +38,7 @@ def moyenne_classe(d):
         float : Moyenne des notes.
         None : Si le dictionnaire est vide.
     """
-    if len(d) == 0:  # Vérification du dictionnaire vide
-        return None
-
-    moyenne = sum(d.values()) / len(d)  # Calcul de la moyenne
-    return round(moyenne, 2)  # Arrondi à 2 décimales
+    return round(sum(d.values()) / len(d), 2) if d else None # Calcul de la moyenne avec vérification du dictionnaire vide, arrondi à 2 décimales
 
 def meilleur_etudiant(d):
     """
@@ -55,16 +51,14 @@ def meilleur_etudiant(d):
         tuple : Nom et note du meilleur étudiant.
         None : Si le dictionnaire est vide.
     """
-    if len(d) == 0:  # Vérification du dictionnaire vide
-        return None
+    if not d: return None  # Vérification du dictionnaire vide
 
     meilleur_nom = ""
     meilleure_note = -1
 
     for nom, note in d.items():  # Parcours des étudiants
         if note > meilleure_note:  # Comparaison des notes
-            meilleure_note = note
-            meilleur_nom = nom
+            meilleure_note, meilleur_nom = note, nom
 
     return (meilleur_nom, meilleure_note)  # Retourne un tuple
 
@@ -107,20 +101,21 @@ def charger_etudiants(fichier):
             for ligne in f:  # Lecture ligne par ligne
                 ligne = ligne.strip()  # Suppression des espaces inutiles
 
-                if ligne == "":  # Ignore les lignes vides
-                    continue
+                if not ligne: continue  # Ignore les lignes vides
 
                 if ligne.count(":") != 1:  # Vérification du format
                     print(f"Ligne mal formée : {ligne}")
                     continue
 
                 nom, note = ligne.split(":")  # Séparation nom et note
+                nom = nom.strip()
+                note = note.strip()
 
-                if nom.strip() == "":  # Vérification du nom
+                if not nom:  # Vérification du nom
                     print("Erreur : nom vide.")
                     continue
 
-                ajouter_etudiant(d, nom.strip(), note)  # Ajout de l'étudiant
+                ajouter_etudiant(d, nom, note)  # Ajout de l'étudiant
 
     except FileNotFoundError:  # Fichier inexistant
         print("Erreur : fichier introuvable.")
@@ -131,16 +126,16 @@ def charger_etudiants(fichier):
     return d
 
 # Tests du programme
+if __name__ == "__main__":
+    ajouter_etudiant(dic, "Alice", 12)
+    ajouter_etudiant(dic, "Bob", 15)
+    ajouter_etudiant(dic, "Claire", 9.5)
 
-ajouter_etudiant(dic, "Alice", 12)
-ajouter_etudiant(dic, "Bob", 15)
-ajouter_etudiant(dic, "Claire", 9.5)
+    print("Étudiants :", dic)
+    print("Moyenne :", moyenne_classe(dic))
+    print("Meilleur étudiant :", meilleur_etudiant(dic))
 
-print("Étudiants :", dic)
-print("Moyenne :", moyenne_classe(dic))
-print("Meilleur étudiant :", meilleur_etudiant(dic))
+    sauvegarder_etudiants(dic, "etudiants.txt")  # Sauvegarde
+    dic_charge = charger_etudiants("etudiants.txt")  # Chargement
 
-sauvegarder_etudiants(dic, "etudiants.txt")  # Sauvegarde
-
-dic_charge = charger_etudiants("etudiants.txt")  # Chargement
-print("Dictionnaire rechargé :", dic_charge)
+    print("Dictionnaire rechargé :", dic_charge)
