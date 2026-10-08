@@ -47,9 +47,9 @@ def jouer_pendu(mot):
 
         lettres_proposees.append(lettre)  # Enregistrement de la lettre
 
-        if lettre in mot:  # Vérification de la présence dans le mot
-            for i in range(len(mot)):  # Parcours des positions
-                if mot[i] == lettre:
+        if lettre in mot:
+            for i, caractere in enumerate(mot):  # Parcours du mot
+                if caractere == lettre:
                     mot_masque[i] = lettre  # Révélation de la lettre
 
             print("Bonne lettre !")
@@ -61,11 +61,8 @@ def jouer_pendu(mot):
     print(f"Erreurs : {erreurs}/7")
     print(dessins[erreurs])
 
-    if "_" not in mot_masque:  # Vérification de la victoire
-        return f"Gagné ! Le mot était {mot}."
-
-    return f"Perdu ! Le mot était {mot}."
-
+    resultat = "Gagné" if "_" not in mot_masque else "Perdu"
+    return f"{resultat} ! Le mot était {mot}."
 
 def choisir_mode():
     """
@@ -73,17 +70,16 @@ def choisir_mode():
 
     Retour :
         str : Mot à deviner en majuscules.
+        None : Si aucun mot n'est disponible.
     """
     while True:
-        print("\n1 - Jouer seul")
-        print("2 - Jouer à deux")
+        print("\n1 - Jouer seul\n2 - Jouer à deux")
 
-        choix = input("Choisissez un mode (1/2) : ")
+        choix = input("Choisissez un mode (1/2) : ").strip()
 
-        if choix == "1":
-            return choisir_mot(mots)  # Mot aléatoire de la partie C
+        if choix == "1": return choisir_mot(mots)  # Mode solo, Mot aléatoire de la partie C
 
-        elif choix == "2":
+        if choix == "2":
             while True:
                 mot = input("Joueur 1, entrez un mot : ").strip().upper()
 
@@ -92,15 +88,30 @@ def choisir_mode():
                     return mot
 
                 print("Erreur : entrez un mot contenant uniquement des lettres.")
-
         else:
             print("Erreur : choisissez 1 ou 2.")
 
+def jouer():
+    """
+    Permet de rejouer au Pendu après chaque partie.
+
+    Retour :
+        None
+    """
+    while True:  # Boucle de rejouabilité
+        mot = choisir_mode()  # Choix du mode et du mot
+
+        print(jouer_pendu(mot)) if mot else print("Erreur : aucun mot disponible.")
+
+        while True:
+            reponse = input("\nRejouer ? (o/n) : ").strip().lower()
+
+            if reponse in ("o", "n"): break
+            print("Erreur : entrez o ou n.")
+
+        if reponse == "n":
+            print("Merci d'avoir joué !")
+            break
 
 if __name__ == "__main__":
-    mot = choisir_mode()  # Sélection du mode de jeu
-
-    if mot is not None:  # Vérification de la liste de mots
-        print(jouer_pendu(mot))  # Lancement du pendu
-    else:
-        print("Erreur : aucun mot disponible.")
+    jouer()  # Lancement du jeu avec rejouabilité
