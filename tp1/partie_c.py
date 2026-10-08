@@ -13,11 +13,7 @@ def choisir_mot(liste):
         str : Mot choisi en majuscules.
         None : Si la liste est vide.
     """
-    if len(liste) == 0:  # Vérification de la liste vide
-        return None
-
-    mot = random.choice(liste)  # Choix d'un mot aléatoire
-    return mot.upper()  # Conversion en majuscules
+    return random.choice(liste).upper() if liste else None # Choix et conversion du mot
 
 def masque(mot):
     """
@@ -29,12 +25,7 @@ def masque(mot):
     Retour :
         list : Liste contenant les caractères "_".
     """
-    liste_masque = []  # Initialisation du masque
-
-    for lettre in mot:  # Parcours des lettres du mot
-        liste_masque.append("_")  # Ajout d'un caractère "_"
-
-    return liste_masque
+    return ["_"] * len(mot)  # Création du masque
 
 # Tests du programme
 if __name__ == "__main__":
