@@ -1,5 +1,6 @@
 
 from partie_c import mots, choisir_mot, masque
+import math
 
 def jouer_pendu(mot):
     """
@@ -91,17 +92,35 @@ def choisir_mode():
         else:
             print("Erreur : choisissez 1 ou 2.")
 
-def jouer():
+"""
+BONUS 1
+"""
+
+def jouer(scores):
     """
-    Permet de rejouer au Pendu après chaque partie.
+    Permet de rejouer au Pendu après chaque partie et de comptabiliser les victoires.
+
+    Paramètre :
+        scores (dict) : Dictionnaire des scores des joueurs.
 
     Retour :
         None
     """
     while True:  # Boucle de rejouabilité
-        mot = choisir_mode()  # Choix du mode et du mot
+        nom = input("Nom du joueur : ").strip()  # Saisie du nom
 
-        print(jouer_pendu(mot)) if mot else print("Erreur : aucun mot disponible.")
+        if not nom or ":" in nom:
+            print("Erreur : nom invalide.")
+            continue
+
+        mot = choisir_mode()  # Choix du mode
+        resultat = jouer_pendu(mot) if mot else "Erreur : aucun mot disponible."
+
+        print(resultat)
+
+        if resultat.startswith("Gagné"):  # Vérification de la victoire
+            scores[nom] = scores.get(nom, 0.0) + 1  # Ajout d'une victoire
+            print(f"{nom} : {scores[nom]} victoire(s)")
 
         while True:
             reponse = input("\nRejouer ? (o/n) : ").strip().lower()
@@ -113,5 +132,77 @@ def jouer():
             print("Merci d'avoir joué !")
             break
 
+def charger_scores(fichier):
+    """
+    Charge les scores des joueurs depuis un fichier texte.
+
+    Paramètre :
+        fichier (str) : Fichier contenant les scores.
+
+    Retour :
+        dict : Dictionnaire des joueurs et de leurs victoires.
+    """
+    scores = {}
+
+    try:
+        with open(fichier, "r", encoding="utf-8") as f:  # Ouverture en lecture
+            for ligne in f:  # Lecture ligne par ligne
+                ligne = ligne.strip()  # Suppression des espaces inutiles
+
+                if not ligne: continue  # Ignore les lignes vides
+
+                if ligne.count(":") != 1:  # Vérification du format
+                    print(f"Ligne mal formée : {ligne}")
+                    continue
+
+                nom, victoires = ligne.split(":")  # Séparation des données
+                nom = nom.strip()
+
+                if not nom:  # Vérification du nom
+                    print("Erreur : nom vide.")
+                    continue
+
+                try:
+                    victoires = float(victoires)  # Conversion en float
+                except ValueError:
+                    print(f"Score invalide pour {nom}.")
+                    continue
+
+                if not math.isfinite(victoires) or victoires < 0:
+                    print(f"Score invalide pour {nom}.")
+                    continue
+
+                scores[nom] = victoires  # Ajout du joueur et de son score
+
+    except FileNotFoundError:
+        pass  # Premier lancement : aucun score enregistré
+
+    except (OSError, UnicodeError) as e:
+        print(f"Erreur de lecture : {e}")
+
+    return scores
+
+def sauvegarder_scores(scores, fichier):
+    """
+    Sauvegarde les scores des joueurs dans un fichier texte
+    au format nom:victoires.
+
+    Paramètres :
+        scores (dict) : Dictionnaire des joueurs et de leurs victoires.
+        fichier (str) : Nom du fichier de sauvegarde.
+
+    Retour :
+        None
+    """
+    try:
+        with open(fichier, "w", encoding="utf-8") as f:  # Ouverture en écriture
+            for nom, victoires in scores.items():  # Parcours des scores
+                f.write(f"{nom}:{float(victoires)}\n")  # Sauvegarde du score
+
+    except OSError as e:  # Gestion des erreurs d'écriture
+        print(f"Erreur de sauvegarde : {e}")
+
 if __name__ == "__main__":
-    jouer()  # Lancement du jeu avec rejouabilité
+    scores = charger_scores("scores.txt")  # Chargement des scores
+    jouer(scores)  # Lancement du Pendu
+    sauvegarder_scores(scores, "scores.txt")  # Sauvegarde des scores
